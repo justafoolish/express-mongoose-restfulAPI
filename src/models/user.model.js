@@ -9,17 +9,20 @@ const UserSchema = new mongoose.Schema({
         required: true,
         unique: true,
         min: 8,
-        max: 255
+        max: 255,
+        trim: true,
     },
     password: {
         type: String,
         required: true,
         min: 6,
-        max: 255
+        max: 255,
+        trim: true,
     },
     name: {
         type: String,
         max: 255,
+        trim: true,
     }
 
 }, { timestamps: true });
@@ -53,4 +56,4 @@ UserSchema.methods.verifyPassword = async function verifyPassword(data) {
     return bcrypt.compare(data, this.password);
 }
 
-module.exports = mongoose.model('user', UserSchema);
+module.exports = mongoose.model('Users', UserSchema);

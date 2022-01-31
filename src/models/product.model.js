@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 const slug = require('mongoose-slug-generator');
 
-const productSchema = new mongoose.Schema({
+mongoose.plugin(slug)
+
+const ProductSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -9,41 +11,36 @@ const productSchema = new mongoose.Schema({
     },
     slug: {
         type: String,
-        slug: slug,
+        slug: 'name',
         unique: true
     },
-    category: {
-        type: String,
-        required: true,
+    collections: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Collection',
+        default: null,
     },
-    subcategory: {
-        type: String,
-        model: [{
-            type: String,
-            color: [{
-                name: String,
-                image: [{
-                    type: String,
-                }]
-            }],
-            size: [{
-                val: String,
-                price: {
-                    type: Number,
-                    required: true,
-                    
-                }
-            }]
-        }]
+    image: [
+        { type: String },
+    ],
+    price: {
+        type: Number,
+        required: true,
+        min: 0
     },
     description: {
         type: String,
         max: 255
     },
+    quantity: {
+        type: Number,
+        min: 0,
+        required: true,
+    },
     sold: {
         type: Number,
-        default: 0,
+        min: 0,
+        default: 0
     }
 }, { timestamps: true });
 
-module.exports = mongoose.model('product', productSchema);
+module.exports = mongoose.model('Products', ProductSchema);

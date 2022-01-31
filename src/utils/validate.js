@@ -11,10 +11,18 @@ const loginSchema = Joi.object({
     password: Joi.string().min(6).max(255).required(),
 })
 
+const filtersSchema = Joi.object({
+    _limit: Joi.number().integer().greater(0).min(1).positive(),
+    _page: Joi.number().integer().greater(0).min(1).positive(),
+    _sort: Joi.string(),
+    _order: Joi.string(),
+}).pattern(/[\D_like]/, Joi.string().allow(''));
+
 
 module.exports = {
     registerSchema,
-    loginSchema
+    loginSchema,
+    filtersSchema
 }
 
 //Note: route param can be validate here
