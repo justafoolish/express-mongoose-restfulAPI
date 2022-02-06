@@ -8,6 +8,9 @@ userRoutes
     /** POST: /api/user/register - User registration */
     .post('/register', validateRegister, userController.register)
 
+    /**POST: /api/user/token - Verify token user */
+    .post('/token', auth.verifyToken, userController.verifyToken)
+
     /** POST: /api/user/login - User login */
     .post('/login', validateLogin, userController.login)
 
@@ -15,10 +18,10 @@ userRoutes
     .get('/', auth.verifyToken, userController.getUserList)
 
     /** GET: /api/user/:id - Get specific user by id */
-    .get('/:id',auth.verifyToken, userController.getUser)
+    .get('/:id', auth.verifyToken, userController.getUser)
 
     /** DELETE: /api/user/:id - Delete user */
-    .delete('/:id',auth.verifyToken, userController.removeUser)
+    .delete('/:id', auth.verifyToken, userController.removeUser)
 
 
 module.exports = userRoutes

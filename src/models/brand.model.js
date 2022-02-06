@@ -3,7 +3,7 @@ const slug = require('mongoose-slug-generator')
 
 mongoose.plugin(slug)
 
-const CollectionSchema = new mongoose.Schema({
+const BrandSchema = new mongoose.Schema({
     name: {
         type: String,
         max: 255,
@@ -27,4 +27,5 @@ const CollectionSchema = new mongoose.Schema({
     ]
 }, { timestamps: true })
 
-module.exports = mongoose.model('Collections', CollectionSchema)
+
+module.exports = mongoose.model('Brands', BrandSchema)

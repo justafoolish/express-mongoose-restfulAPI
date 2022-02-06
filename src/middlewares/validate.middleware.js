@@ -7,7 +7,7 @@ const validateLogin = async (req, res, next) => {
         .validateAsync(req.body)
         .then(() => next())
         .catch(error =>
-            res.status(400).json({
+            res.status(200).json({
                 success: false,
                 message: error.details[0].message
             })
@@ -20,7 +20,7 @@ const validateRegister = async (req, res, next) => {
         .validateAsync(req.body)
         .then(() => next())
         .catch(error =>
-            res.status(400).json({
+            res.status(200).json({
                 success: false,
                 message: error.details[0].message
             })
@@ -33,7 +33,7 @@ const validateFilterParams = async (req, res, next) => {
         .validateAsync(req.query)
         .then(() => next())
         .catch(error =>
-            res.status(400).json({
+            res.status(200).json({
                 success: false,
                 message: error.details[0].message
             })

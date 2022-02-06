@@ -5,14 +5,14 @@ class UserController {
     async login(req, res) {
         //check if email exists
         const user = await UserModel.findOne({ email: req.body.email.trim() })
-        if (!user) return res.status(400).json({
+        if (!user) return res.status(200).json({
             success: false,
             message: 'Email is not found'
         });
 
         //check if password is correct
         const verifyPassword = await user.verifyPassword(req.body.password.trim())
-        if (!verifyPassword) return res.status(400).json({
+        if (!verifyPassword) return res.status(200).json({
             success: false,
             message: 'Password is incorrect'
         });
@@ -21,16 +21,17 @@ class UserController {
         const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET, {
             expiresIn: '1h'
         })
-        res.header('auth-token', token).json({
+        res.header('token', token).json({
             success: true,
-            data: token
+            token: token
         })
 
     }
+
     async register(req, res, next) {
         //check is email duplicate
         const isEmailExist = await UserModel.findOne({ email: req.body.email.trim() })
-        if (isEmailExist) return res.status(400).json({
+        if (isEmailExist) return res.status(200).json({
             success: false,
             message: 'Email already exists'
         })
@@ -54,7 +55,7 @@ class UserController {
 
     async getUser(req, res) {
         const user = await UserModel.findOne({ _id: req.params.id }, { password: 0 })
-        if (!user) return res.status(400).json({
+        if (!user) return res.status(200).json({
             success: false,
             message: 'Email is not found'
         });
@@ -79,6 +80,13 @@ class UserController {
                 message: err
             }))
 
+    }
+
+    verifyToken(req, res) {
+        res.status(200).json({
+            success: true,
+            token: req.header('token')
+        })
     }
 }
 

@@ -14,10 +14,9 @@ const ProductSchema = new mongoose.Schema({
         slug: 'name',
         unique: true
     },
-    collections: {
+    brand: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Collection',
-        default: null,
+        ref: 'Brands',
     },
     image: [
         { type: String },
