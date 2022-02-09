@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors')
 const db = require('./config/db')
-const router = require('./routes');
+const routes = require('./routes');
 const path = require("path");
 const methodOverride = require('method-override');
 const filtersMiddleware = require('./middlewares/filters.middleware')
@@ -36,10 +36,22 @@ app.use(express.json());
 
 // form-data
 app.use(upload.array())
-app.use(express.static(path.join(__dirname, "./public")));
 
-// routes init 
-router(app)
+// routes init
+app.use('/api', routes);
+
+// static file
+app.use(express.static(path.join(__dirname, "../public/")));
+
+// client site for testing
+app
+    .use('/user', (req, res) => {
+        res.sendFile(path.join(__dirname, '../public/index.html'))
+    })
+    .use('/form', (req, res) => {
+        res.sendFile(path.join(__dirname, '../public/form.html'))
+    })
+
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => console.log(`connected port ${port}`));

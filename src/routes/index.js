@@ -1,14 +1,18 @@
+const expressRoute = require('express').Router()
+
 const userRoutes = require('./user.routes')
 const productRoutes = require('./product.routes')
 const brandRoutes = require('./brand.routes')
 
-const route = app => {
+expressRoute
 
-    app.use('/api/user', userRoutes)
+    /** Endpoint: /api/user */
+    .use('/user', userRoutes)
 
-    app.use('/api/product', productRoutes)
+    /** Endpoint: /api/product */
+    .use('/product', productRoutes)
 
-    app.use('/api/brand', brandRoutes)
-}
+    /** Endpoint: /api/brand */
+    .use('/brand', brandRoutes)
 
-module.exports = route
+module.exports = expressRoute

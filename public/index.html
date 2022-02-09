@@ -1,0 +1,233 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auth</title>
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+      const Login = ({ setUser }) => {
+        const [email, setEmail] = React.useState("");
+        const [password, setPassword] = React.useState("");
+        const [renderLogin, setRenderLogin] = React.useState(true);
+
+        const [response, setResponse] = React.useState({
+          success: true,
+          message: "",
+        });
+
+        const errorMessage = () => {
+          if (!response.success) {
+            return (
+              <div className="message-response">
+                <p>{response.message}</p>
+              </div>
+            );
+          }
+          return "";
+        };
+
+        const switchForm = (val) => {
+          setResponse({
+            success: false,
+            message: "",
+          });
+
+          setRenderLogin(val);
+        };
+
+        const submit = (e) => {
+          e.preventDefault();
+          //   console.log(email, password);
+
+          axios
+            .post("/api/user/login", {
+              // name: name,
+              email: email,
+              password: password,
+            })
+            .then((res) => {
+              const { data } = res;
+              if (data.success) {
+                // console.log(data.token);
+                localStorage.setItem("token", data.token);
+                setUser({
+                  login: true,
+                  token: data.token,
+                });
+              } else {
+                // console.log(data.message);
+                setResponse({
+                  success: false,
+                  message: data.message,
+                });
+              }
+            })
+            .catch(console.log);
+        };
+
+        /** Register */
+        const [regEmail, setRegEmail] = React.useState("");
+        const [regName, setRegName] = React.useState("");
+        const [regPassword, setRegPassword] = React.useState("");
+
+        const register = (e) => {
+          e.preventDefault();
+
+          axios
+            .post("/api/user/register", {
+              name: regName,
+              email: regEmail,
+              password: regPassword,
+            })
+            .then((res) => {
+              const { data } = res;
+              if (data.success) {
+                setRenderLogin(true);
+              } else {
+                // console.log(data.message);
+                setResponse({
+                  success: false,
+                  message: data.message,
+                });
+              }
+            })
+            .catch(console.log);
+        };
+
+        return (
+          <div className="form">
+            <form className={`register-form ${!renderLogin ? "visible" : "hidden"}`}>
+              <input type="text" placeholder="name" value={regName} onChange={(e) => setRegName(e.target.value)} />
+              <input type="text" placeholder="email address" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
+              <input type="password" placeholder="password" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} />
+              {!renderLogin && errorMessage()}
+              <button onClick={(e) => register(e)}>create</button>
+              <p className="message">
+                Already registered? <a onClick={() => switchForm(true)}>Sign In</a>
+              </p>
+            </form>
+            <form className={`login-form ${renderLogin ? "visible" : "hidden"}`}>
+              <input type="text" placeholder="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <input type="password" placeholder="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+              {renderLogin && errorMessage()}
+              <button onClick={submit}>login</button>
+              <p className="message">
+                Not registered? <a onClick={() => switchForm(false)}>Create an account</a>
+              </p>
+            </form>
+          </div>
+        );
+      };
+
+      const ProductForm = () => {
+        const [name, setName] = React.useState("");
+        const [brand, setBrand] = React.useState();
+        const [price, setPrice] = React.useState(0);
+        const [quantity, setQuantity] = React.useState(0);
+        const [image, setImage] = React.useState([]);
+
+        const [listBrand, setListBrand] = React.useState([]);
+
+        React.useEffect(() => {
+          axios
+            .get("/api/brand")
+            .then(({ data }) => {
+              if (data.success) setListBrand(data.data);
+            })
+            .catch(console.log);
+        }, []);
+        console.log(price);
+        return (
+          <form className={`register-form`} encType="multipart/form-data">
+            <input type="text" placeholder="name" onChange={(e) => setName(e.target.value)} value={name} />
+            <input type="number" placeholder="price" value={price} onChange={(e) => e.target.value > 0 && setPrice(e.target.value)} />
+            <input type="number" placeholder="quantity" value={quantity} onChange={(e) => e.target.value > 0 && setQuantity(e.target.value)}/>
+            <select onChange={(e) => setBrand(e.target.value)}>
+              <option defaultValue="" disabled>
+                Brand
+              </option>
+              {listBrand &&
+                listBrand.map((brand) => (
+                  <option value={brand._id} key={brand._id}>
+                    {brand.name}
+                  </option>
+                ))}
+            </select>
+            <button>create</button>
+          </form>
+        );
+      };
+
+      const App = () => {
+        const [user, setUser] = React.useState({
+          login: false,
+          token: "",
+        });
+
+        React.useEffect(() => {
+          if (localStorage.token) {
+            const token = localStorage.token;
+
+            axios
+              .post("/api/user/token", {}, { headers: { token } })
+              .then(({ data }) => {
+                if (data.success)
+                  setUser({
+                    login: true,
+                    data: data.user,
+                    token: data.token,
+                  });
+                else {
+                  localStorage.token = "";
+                  setUser({
+                    login: false,
+                  });
+                }
+              })
+              .catch(console.log);
+          }
+        }, [localStorage.token]);
+
+        console.log(user);
+
+        const logout = () => {
+          localStorage.token = "";
+          setUser({ login: false, token: "" });
+        };
+
+        if (!localStorage.token) {
+          return (
+            <div>
+              <Login setUser={setUser} />
+            </div>
+          );
+        } else {
+          return (
+            <div className="form">
+              <h2>Hi {user.data && user.data.name}</h2>
+              <div>
+                <ProductForm />
+              </div>
+              <button className="logout" onClick={logout}>
+                Logout
+              </button>
+            </div>
+          );
+        }
+      };
+
+      // render the component to the DOM
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>

@@ -19,8 +19,12 @@ class UserController {
 
         // create and assign a token
         const token = jwt.sign({ _id: user._id }, process.env.TOKEN_SECRET, {
-            expiresIn: '1h'
+            expiresIn: '2h'
         })
+        // const { _id, email, name } = user;
+
+        delete user.password;
+
         res.header('token', token).json({
             success: true,
             token: token
@@ -82,11 +86,14 @@ class UserController {
 
     }
 
-    verifyToken(req, res) {
-        res.status(200).json({
-            success: true,
-            token: req.header('token')
-        })
+    verifyToken(req, res, next) {
+        UserModel.findOne({ _id: req.user }, { password: 0 }).then(user => {
+            res.status(200).json({
+                success: true,
+                user,
+                token: req.header('token')
+            })
+        }).catch(next)
     }
 }
 
